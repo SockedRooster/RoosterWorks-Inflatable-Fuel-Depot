@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Check that an InflataDepot release ZIP has the expected installable structure."""
+"""Check that a RoosterWorks-Inflatable-Fuel-Depot release ZIP has the expected installable structure."""
 from zipfile import ZipFile
 from pathlib import Path
 import sys
 
-p = Path(sys.argv[1]) if len(sys.argv)>1 else Path('InflataDepot-v1.0.0.zip')
+p = Path(sys.argv[1]) if len(sys.argv)>1 else Path('RoosterWorks-Inflatable-Fuel-Depot-v1.1.1.zip')
 with ZipFile(p) as z:
     assert z.testzip() is None, 'Corrupt ZIP member'
     names=set(z.namelist())

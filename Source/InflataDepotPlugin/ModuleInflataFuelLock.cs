@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using B9PartSwitch;
 
 // MIT License - (c) 2026 SockedRooster.
 // KSP 1.12.x: the deployment guard owns the flight UI so that a loaded depot
@@ -27,11 +28,12 @@ namespace InflataDepot
         public bool retractionPending = false;
 
         [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Depot storage")]
-        public string storageStatus = "STOWED - NO FUEL";
+        public string storageStatus = "STOWED - EMPTY";
 
         private const double EmptyTolerance = 0.000001d;
         private const float DeployedThreshold = 0.999f;
         private ModuleAnimateGeneric animator;
+        private ModuleB9PartSwitch storageSwitcher;
         private bool missingAnimationWarned;
         private bool wasPreviouslyUnlocked;
         private bool warnedAboutForcedReturn;
@@ -54,8 +56,8 @@ namespace InflataDepot
             LocateAnimation();
             // Do not trust menu visibility: action groups or external calls can
             // invoke this event, so always check the ACTUAL stored amounts.
-            if (animator == null || animator.IsMoving() ||
-                animator.animTime < DeployedThreshold || HasFuel())
+            if (!LocateStorage() || animator == null || animator.IsMoving() ||
+                animator.animTime < DeployedThreshold || HasCargo())
             {
                 Debug.Log("[InflataDepot] Deflation blocked: the depot must be fully deployed and empty.");
                 UpdateControls();
@@ -124,7 +126,7 @@ namespace InflataDepot
             retractionPending = false;
             storageStatus = animator != null && animator.animTime >= DeployedThreshold
                 ? "INFLATED - EMPTY AT LAUNCH"
-                : "STOWED - NO FUEL";
+                : "STOWED - EMPTY";
         }
 
         public override void OnFixedUpdate()
@@ -217,13 +219,29 @@ namespace InflataDepot
             if (stockAction != null) stockAction.active = false;
         }
 
-        private bool HasFuel()
+        private bool LocateStorage()
         {
-            if (part == null || part.Resources == null) return false;
-            PartResource lf = part.Resources.Get("LiquidFuel");
-            PartResource ox = part.Resources.Get("Oxidizer");
-            return (lf != null && lf.amount > EmptyTolerance) ||
-                   (ox != null && ox.amount > EmptyTolerance);
+            if (storageSwitcher == null && part != null)
+                foreach (PartModule module in part.Modules)
+                {
+                    ModuleB9PartSwitch candidate = module as ModuleB9PartSwitch;
+                    if (candidate != null && candidate.moduleID == "InflataFuel")
+                    {
+                        storageSwitcher = candidate;
+                        break;
+                    }
+                }
+            return storageSwitcher != null && storageSwitcher.CurrentSubtype != null &&
+                storageSwitcher.CurrentTankType != null;
+        }
+
+        private bool HasCargo()
+        {
+            if (part == null || part.Resources == null || !LocateStorage()) return false;
+            foreach (PartResource resource in part.Resources)
+                if (storageSwitcher.IsManagedResource(resource.resourceName) && resource.amount > EmptyTolerance)
+                    return true;
+            return false;
         }
 
         private void UpdateControls()
@@ -233,7 +251,7 @@ namespace InflataDepot
             bool idle = animator != null && !animator.IsMoving();
             bool stowed = idle && animator.animTime <= 0.02f;
             bool deployed = idle && animator.animTime >= DeployedThreshold;
-            bool isEmpty = !HasFuel();
+            bool isEmpty = LocateStorage() && !HasCargo();
             BaseEvent inflate = Events["InflateDepot"];
             BaseEvent deflate = Events["DeflateDepot"];
             if (inflate != null) inflate.active = stowed;
@@ -248,7 +266,7 @@ namespace InflataDepot
         {
             // Defense in depth: if a third-party mod invokes ModuleAnimateGeneric
             // directly, cancel the reverse when there is any fuel in either tank.
-            if (!storageUnlocked || !HasFuel() || animator == null) return;
+            if (!HasCargo() || animator == null) return;
             AnimationState animState = animator.GetState();
             if (animator.IsMoving() && animState != null && animState.speed < -0.00001f)
             {
@@ -267,15 +285,18 @@ namespace InflataDepot
 
         private void EmptyInEditor()
         {
-            PartResource lf = part.Resources.Get("LiquidFuel");
-            PartResource ox = part.Resources.Get("Oxidizer");
-            if (lf != null) lf.amount = 0d;
-            if (ox != null) ox.amount = 0d;
+            if (!LocateStorage()) return;
+            foreach (PartResource resource in part.Resources)
+                if (storageSwitcher.IsManagedResource(resource.resourceName)) resource.amount = 0d;
         }
 
         private void SyncFlightCapacity()
         {
             LocateAnimation();
+            if (!LocateStorage()) return;
+            // Cargo from an existing save must never be deleted due to startup
+            // order or a missing/stale persisted unlock flag.
+            if (HasCargo()) storageUnlocked = true;
             if (animator != null)
             {
                 bool fullyDeployed = animator.animTime >= DeployedThreshold && !animator.IsMoving();
@@ -287,26 +308,29 @@ namespace InflataDepot
                 // Once a previously empty depot retracts, lock capacity again.
                 // Never delete existing fuel because of a momentary animation or
                 // startup-order discrepancy: protect saved loaded vessels.
-                if (storageUnlocked && !fullyDeployed && !HasFuel())
+                if (storageUnlocked && !fullyDeployed && !HasCargo())
                     storageUnlocked = false;
             }
 
-            PartResource lf = part.Resources.Get("LiquidFuel");
-            PartResource ox = part.Resources.Get("Oxidizer");
             if (!storageUnlocked)
             {
-                ApplyLocked(lf);
-                ApplyLocked(ox);
+                foreach (PartResource resource in part.Resources)
+                    if (storageSwitcher.IsManagedResource(resource.resourceName)) ApplyLocked(resource);
                 storageStatus = "LOCKED - INFLATE TO FILL";
                 wasPreviouslyUnlocked = false;
                 return;
             }
 
-            bool useOxidizer = ox != null;
-            ApplyUnlocked(lf, nominalVolume * (useOxidizer ? 0.45d : 1d));
-            ApplyUnlocked(ox, nominalVolume * 0.55d);
-            storageStatus = HasFuel()
-                ? "INFLATED - FUEL PRESENT / DEFLATE LOCKED"
+            // Read B9's selected tank definition, not current maxAmount (which
+            // is zero while stowed). This also restores capacity after reload.
+            double volume = storageSwitcher.GetTotalVolume(storageSwitcher.CurrentSubtype);
+            foreach (TankResource definition in storageSwitcher.CurrentTankType.resources)
+            {
+                PartResource resource = part.Resources.Get(definition.ResourceName);
+                ApplyUnlocked(resource, volume * definition.unitsPerVolume);
+            }
+            storageStatus = HasCargo()
+                ? "INFLATED - CARGO PRESENT / DEFLATE LOCKED"
                 : "INFLATED - EMPTY / MAY DEFLATE";
             wasPreviouslyUnlocked = true;
         }
@@ -324,7 +348,8 @@ namespace InflataDepot
             if (resource == null) return;
             bool hadZeroCapacity = resource.maxAmount <= 0d;
             resource.maxAmount = Math.Max(0d, capacity);
-            if (resource.amount > resource.maxAmount) resource.amount = resource.maxAmount;
+            // Preserve cargo if a save or another mod has left it over capacity.
+            resource.maxAmount = Math.Max(resource.maxAmount, resource.amount);
             if (hadZeroCapacity || !wasPreviouslyUnlocked) resource.flowState = true;
         }
     }

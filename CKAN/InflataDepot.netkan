@@ -1,17 +1,17 @@
 spec_version: 1
 identifier: InflataDepot
-name: RoosterWorks InflataDepot
-abstract: Compact deployable cylindrical orbital fuel tanks with docking, guarded fuel storage and selectable LF/OX or LF-only capacity
-$kref: '#/ckan/github/SockedRooster/KSP-Inflatable-Fuel-Depots/asset_match/^InflataDepot-v[0-9]+\.[0-9]+\.[0-9]+\.zip$'
+name: RoosterWorks- Inflatable- Fuel-Depot
+abstract: Compact deployable cylindrical orbital fuel tanks with docking, guarded fuel storage and six selectable resource configurations
+$kref: '#/ckan/github/SockedRooster/RoosterWorks-Inflatable-Fuel-Depot/asset_match/^(InflataDepot|RoosterWorks-Inflatable-Fuel-Depot)-v[0-9]+\.[0-9]+\.[0-9]+\.zip$'
 author: SockedRooster
 license: MIT
 release_status: stable
 # First release targeted KSP 1.12.5. Verify wider compatibility before changing.
 ksp_version: 1.12.5
 resources:
-  homepage: https://github.com/SockedRooster/KSP-Inflatable-Fuel-Depots
-  repository: https://github.com/SockedRooster/KSP-Inflatable-Fuel-Depots
-  bugtracker: https://github.com/SockedRooster/KSP-Inflatable-Fuel-Depots/issues
+  homepage: https://github.com/SockedRooster/RoosterWorks-Inflatable-Fuel-Depot
+  repository: https://github.com/SockedRooster/RoosterWorks-Inflatable-Fuel-Depot
+  bugtracker: https://github.com/SockedRooster/RoosterWorks-Inflatable-Fuel-Depot/issues
 depends:
   - name: B9PartSwitch
   - name: ModuleManager

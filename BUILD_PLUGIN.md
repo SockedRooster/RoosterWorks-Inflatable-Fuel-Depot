@@ -1,16 +1,18 @@
-# Building the plugin (developer workflow)
+# Build the plugin
 
-For players: **do not build anything**. The release ZIP already includes a compiled plugin DLL.
+Players install the release ZIP; no build is needed.
+Run Build-Plugin.ps1 -KSPDir "path to KSP" on Windows with KSP 1.12.x and
+B9 Part Switch installed. The script uses the .NET Framework C# compiler and
+references local KSP, Unity and GameData/B9PartSwitch/Plugins/B9PartSwitch.dll.
+Only InflataDepotPlugin.dll is distributed; dependency binaries are not bundled.
 
-Developers on Windows may rebuild the DLL with `Build-Plugin.cmd` (or `Build-Plugin.ps1`)
-from this repository root. You need a local KSP 1 installation because the script references
-KSP's `Assembly-CSharp.dll` and Unity managed DLLs, including `UnityEngine.UI.dll`.
-Those game assemblies are **not** distributed with this repository.
+Source/Tests/ResourceRegression.cs is an offline mock-API harness. Compile it
+with Source/InflataDepotPlugin/ModuleInflataFuelLock.cs into a separate executable
+without game references, then run it. Never use that test executable as the plugin.
+The harness covers six configurations and three sizes. It does not simulate
+KSP/Unity/B9 initialization, UI or actual resource transfer.
 
-`Source/InflataDepotPlugin/ModuleInflataFuelLock.cs` implements the storage lock
-and guarded inflate/deflate actions. The public release DLL was supplied and
-in-game tested by the author; recompiling the source is optional for development.
-
-`Source/build.py` generates models/assets. **Do not regenerate the released `.mu` files
-for a tagged release**, as that would replace the in-game-tested binaries. Make model
-changes in a new development version, then test that version in KSP before releasing.
+Source/test_assets.py validates models, textures and config basics.
+Source/build.py regenerates procedural assets/configs; do not run it for a
+plugin-only release, as it replaces released models. Tank definitions and
+subtypes in that generator are kept aligned with the packaged configs.

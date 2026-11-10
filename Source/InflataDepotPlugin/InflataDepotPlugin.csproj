@@ -14,6 +14,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="B9PartSwitch"><HintPath>$(KSPDir)\GameData\B9PartSwitch\Plugins\B9PartSwitch.dll</HintPath><Private>False</Private></Reference>
     <Reference Include="Assembly-CSharp"><HintPath>$(KSPManagedDir)\Assembly-CSharp.dll</HintPath><Private>False</Private></Reference>
     <Reference Include="UnityEngine"><HintPath>$(KSPManagedDir)\UnityEngine.dll</HintPath><Private>False</Private></Reference>
     <Reference Include="UnityEngine.CoreModule"><HintPath>$(KSPManagedDir)\UnityEngine.CoreModule.dll</HintPath><Private>False</Private></Reference>

@@ -151,8 +151,8 @@ for key,p in EXPECT.items():
     assert 'name = ModuleAnimateGeneric' in config
     assert 'animationName = inflate' in config
     assert config.count('name = ModuleB9PartSwitch')==1
-    assert config.count('SUBTYPE')==2
-    assert 'switcherDescription = Fuel Configuration' in config
+    assert config.count('SUBTYPE')==6
+    assert 'switcherDescription = Resource Configuration' in config
     assert 'tankType = InflataDepot_LFOX' in config and 'tankType = InflataDepot_LF' in config
     assert f'baseVolume = {p["capacity"]}' in config
     assert 'RESOURCE\n' not in config
@@ -189,11 +189,11 @@ for key,p in EXPECT.items():
     # Independent double-sided seal triangles live in the FabricCylinder mesh.
     # The older mesh had roughly 17.5K triangles; the seal adds 384 faces.
     assert mu.tricount >= 18112
-    print(f'PASS {basename}: {mu.meshcount} meshes, {mu.tricount} triangles; 1 fixed base collider + 1 late-activating convex hull; pinned dock center={expected_anchor:.4f}m; packed scale x/z={radial:.4f}, y={height:.2f}; {p["node"]} docking; 2 tank variants')
+    print(f'PASS {basename}: {mu.meshcount} meshes, {mu.tricount} triangles; 1 fixed base collider + 1 late-activating convex hull; pinned dock center={expected_anchor:.4f}m; packed scale x/z={radial:.4f}, y={height:.2f}; {p["node"]} docking; 6 tank variants')
 
 fuel=(G/'InflataDepotTankTypes.cfg').read_text()
-assert fuel.count('B9_TANK_TYPE')==2
-assert fuel.count('percentFilled = 0')==2
+assert fuel.count('B9_TANK_TYPE')==6
+assert fuel.count('percentFilled = 0')==6
 assert 'name = InflataDepot_LFOX' in fuel and 'name = InflataDepot_LF' in fuel
 assert 'unitsPerVolume = 0.45' in fuel and 'unitsPerVolume = 0.55' in fuel
 assert 'unitsPerVolume = 1\n' in fuel

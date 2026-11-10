@@ -58,10 +58,12 @@ ld.rectangle([43,54,56,294],fill=(231,163,49))
 font_bold='/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
 font_regular='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 # Fonts are used during generation only. Font files are not part of the release.
+if not Path(font_bold).exists(): font_bold='C:/Windows/Fonts/arialbd.ttf'
 f1=ImageFont.truetype(font_bold,119)
+if not Path(font_regular).exists(): font_regular='C:/Windows/Fonts/arial.ttf'
 f2=ImageFont.truetype(font_regular,62)
 ld.text((94,60),'RoosterWorks',font=f1,fill=(241,244,244))
-ld.text((99,216),'INFLATABLE DEPOT',font=f2,fill=(232,185,98))
+ld.text((99,216),'INFLATABLE FUEL DEPOT',font=f2,fill=(232,185,98))
 label.save(MODEL/'branding.png',optimize=True)
 
 size=512
@@ -379,38 +381,7 @@ for path in MODEL.glob('*.mu'):path.unlink()
 
 # Tank types use UNIQUE names to avoid collisions with other mods.
 # KSP tank-volume units: LF/OX 0.45 LF + 0.55 OX; LF 1.0 LF.
-(GAMEDATA/'InflataDepotTankTypes.cfg').write_text("""B9_TANK_TYPE
-{
-    name = InflataDepot_LFOX
-    title = LF + Oxidizer
-    tankMass = 0
-    tankCost = 0
-    percentFilled = 0
-    RESOURCE
-    {
-        name = LiquidFuel
-        unitsPerVolume = 0.45
-    }
-    RESOURCE
-    {
-        name = Oxidizer
-        unitsPerVolume = 0.55
-    }
-}
-B9_TANK_TYPE
-{
-    name = InflataDepot_LF
-    title = Liquid Fuel Only
-    tankMass = 0
-    tankCost = 0
-    percentFilled = 0
-    RESOURCE
-    {
-        name = LiquidFuel
-        unitsPerVolume = 1
-    }
-}
-""")
+(GAMEDATA/'InflataDepotTankTypes.cfg').write_text('B9_TANK_TYPE\n{\n    name = InflataDepot_LFOX\n    title = LF + Oxidizer\n    tankMass = 0\n    tankCost = 0\n    percentFilled = 0\n    RESOURCE\n    {\n        name = LiquidFuel\n        unitsPerVolume = 0.45\n    }\n    RESOURCE\n    {\n        name = Oxidizer\n        unitsPerVolume = 0.55\n    }\n}\nB9_TANK_TYPE\n{\n    name = InflataDepot_LF\n    title = Liquid Fuel Only\n    tankMass = 0\n    tankCost = 0\n    percentFilled = 0\n    RESOURCE\n    {\n        name = LiquidFuel\n        unitsPerVolume = 1\n    }\n}\n\nB9_TANK_TYPE\n{\n    name = InflataDepot_OX\n    title = Oxidizer Only\n    tankMass = 0\n    tankCost = 0\n    percentFilled = 0\n    RESOURCE\n    {\n        name = Oxidizer\n        unitsPerVolume = 1\n    }\n}\n\nB9_TANK_TYPE\n{\n    name = InflataDepot_Mono\n    title = Monopropellant\n    tankMass = 0\n    tankCost = 0\n    percentFilled = 0\n    RESOURCE\n    {\n        name = MonoPropellant\n        unitsPerVolume = 1.5\n    }\n}\n\nB9_TANK_TYPE\n{\n    name = InflataDepot_Ore\n    title = Ore\n    tankMass = 0\n    tankCost = 0\n    percentFilled = 0\n    RESOURCE\n    {\n        name = Ore\n        unitsPerVolume = 0.2\n    }\n}\n\nB9_TANK_TYPE\n{\n    name = InflataDepot_Xenon\n    title = Xenon Gas\n    tankMass = 0\n    tankCost = 0\n    percentFilled = 0\n    RESOURCE\n    {\n        name = XenonGas\n        unitsPerVolume = 10\n    }\n}\n')
 
 for p in parts:
     model=build_mu(p)
@@ -438,9 +409,9 @@ for p in parts:
     {{
         organizerSubcategory = lfo
     }}
-    title = RoosterWorks ID-{int(p['diameter']*100):03} Inflatable Depot
+    title = RoosterWorks- Inflatable- Fuel-Depot ID-{int(p['diameter']*100):03}
     manufacturer = RoosterWorks
-    description = RoosterWorks inflatable orbital fuel depot. Launch folded flat and inflate into a reinforced cylindrical bladder. Single bottom docking connection. Fuel type selectable in the VAB. The included deployment-lock module is intended to prevent fuel storage until fully inflated.
+    description = RoosterWorks inflatable orbital fuel depot. Launch folded flat and inflate into a reinforced cylindrical bladder. Single bottom docking connection. Resource type selectable in the VAB. The included deployment-lock module is intended to prevent fuel storage until fully inflated.
     attachRules = 1,0,1,1,0
     bulkheadProfiles = {p['profile']}
     tags = inflatable pancake deploy cylinder orbital depot refuel docking storage liquidfuel oxidizer
@@ -485,8 +456,8 @@ for p in parts:
     {{
         name = ModuleB9PartSwitch
         moduleID = InflataFuel
-        switcherDescription = Fuel Configuration
-        switcherDescriptionPlural = Fuel Configurations
+        switcherDescription = Resource Configuration
+        switcherDescriptionPlural = Resource Configurations
         baseVolume = {p['capacity']}
         switchInFlight = false
         SUBTYPE
@@ -502,6 +473,34 @@ for p in parts:
             title = Liquid Fuel Only
             tankType = InflataDepot_LF
             descriptionSummary = All tank volume allocated to LiquidFuel, empty at launch.
+        }}
+        SUBTYPE
+        {{
+            name = OX
+            title = Oxidizer Only
+            tankType = InflataDepot_OX
+            descriptionSummary = Oxidizer Only storage, empty at launch.
+        }}
+        SUBTYPE
+        {{
+            name = Mono
+            title = Monopropellant
+            tankType = InflataDepot_Mono
+            descriptionSummary = Monopropellant storage, empty at launch.
+        }}
+        SUBTYPE
+        {{
+            name = Ore
+            title = Ore
+            tankType = InflataDepot_Ore
+            descriptionSummary = Ore storage, empty at launch.
+        }}
+        SUBTYPE
+        {{
+            name = Xenon
+            title = Xenon Gas
+            tankType = InflataDepot_Xenon
+            descriptionSummary = Xenon Gas storage, empty at launch.
         }}
     }}
 }}

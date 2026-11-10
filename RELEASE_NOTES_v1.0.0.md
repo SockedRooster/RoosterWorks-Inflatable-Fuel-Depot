@@ -26,4 +26,4 @@ that archive has a different purpose. Install the named release asset above.
 craft action groups assigned to older beta Toggle actions may require reassignment.
 
 Source, documentation, license and bug reports:
-https://github.com/SockedRooster/KSP-Inflatable-Fuel-Depots
+https://github.com/SockedRooster/RoosterWorks-Inflatable-Fuel-Depot

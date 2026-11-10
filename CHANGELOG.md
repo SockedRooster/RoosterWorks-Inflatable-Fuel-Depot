@@ -1,11 +1,27 @@
 # Changelog
 
+## 1.1.1 - Rename
+
+- Renamed the mod to RoosterWorks- Inflatable- Fuel-Depot and updated the three editor titles and depot nameplates. Existing craft and CKAN installations retain their identifiers.
+
+## 1.1.0 - Stock resource storage (2026-10-16)
+
+- Add Ore, Oxidizer-only, Monopropellant and Xenon Gas to all three sizes.
+- Rename the selector Resource Configuration; preserve existing LFOX/LF selections.
+- Read selected tank capacity from B9 Part Switch instead of hard-coded LF/OX capacities.
+- Apply empty-launch, deployment locks and deflation protection to all managed cargo.
+- Preserve saved cargo, including over-capacity contents, during initialization.
+- Keep ancillary resources outside the storage switcher's control untouched.
+- Retain VAB deflation, colour variants, always-on crossfeed and disabled staging.
+- Compile against B9 Part Switch as well as KSP; B9 remains a required external dependency.
+- Passed compilation, asset/config checks and 222 mock-harness assertions; in-game testing pending.
+
 ## 1.0.5 - Remove staging options (2026-10-14)
 
 - Disable docking-port staging and its editor/flight toggle on all three sizes.
 - Restore previously saved staging-enabled ports to disabled through the stock API.
 - Retain manual docking controls, always-on crossfeed, VAB deflation and colour variants.
-- Plugin compilation and offline checks passed; v1.0.5 subsequently tested in-game by the maintainer.
+- Plugin compilation and offline checks passed; in-game verification pending.
 
 ## 1.0.4 - Always-on crossfeed (2026-10-14)
 

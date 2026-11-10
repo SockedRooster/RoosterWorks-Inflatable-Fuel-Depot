@@ -1,4 +1,4 @@
-﻿<#
+<#
 Build the InflataDepot runtime fuel lock against YOUR legally installed KSP1 files.
 No game DLLs are redistributed or uploaded. This generates only InflataDepotPlugin.dll.
 Run from the extracted developer kit. Requires .NET Framework C# compiler (Windows).
@@ -33,6 +33,8 @@ $output = Join-Path $plugins 'InflataDepotPlugin.dll'
 # exposes UI event interfaces from UnityEngine.UI.dll even though this mod does
 # not directly call them. Include every installed UnityEngine module to satisfy
 # those transitive compile-time references across supported KSP 1.12 builds.
+$b9Assembly = Join-Path $KSPDir 'GameData\B9PartSwitch\Plugins\B9PartSwitch.dll'
+if (-not (Test-Path -LiteralPath $b9Assembly)) { throw 'Install B9 Part Switch in this KSP installation before building.' }
 $assemblyCSharp = Join-Path $managed 'Assembly-CSharp.dll'
 $unityAssemblies = @(Get-ChildItem -LiteralPath $managed -Filter 'UnityEngine*.dll' -File | Sort-Object -Property Name)
 $unityUi = Join-Path $managed 'UnityEngine.UI.dll'
@@ -46,6 +48,7 @@ if (Test-Path -LiteralPath $output) { Remove-Item -LiteralPath $output -Force }
 $argsCsc = @('/nologo','/target:library','/optimize+')
 $argsCsc += "/out:$output"
 $argsCsc += "/reference:$assemblyCSharp"
+$argsCsc += "/reference:$b9Assembly"
 foreach ($asm in $unityAssemblies) {
     $argsCsc += "/reference:$($asm.FullName)"
 }
@@ -57,3 +60,4 @@ if ($LASTEXITCODE -ne 0 -or -not (Test-Path $output)) { throw 'Compilation faile
 Write-Host "SUCCESS: $output" -ForegroundColor Green
 Write-Host 'Next: replace GameData/InflataDepot in the KSP installation with the folder in this kit.'
 Write-Host 'In-game, right-click a tank and verify Depot storage reports LOCKED while stowed.'
+
