@@ -2,7 +2,7 @@
 
 **Version 1.1.1 — Kerbal Space Program 1**  
 **Author:** SockedRooster  
-**License:** MIT © 2026 SockedRooster
+**License:** Dual (art assets All Rights Reserved; other content MIT) © 2026 SockedRooster
 
 RoosterWorks- Inflatable- Fuel-Depot adds three inflatable orbital propellant depot parts. Each starts as a compact, empty disc (“pancake”) and expands into a cylindrical tank for use with refueling stations and spacecraft. A single bottom connection functions as a stock-compatible docking port.
 
@@ -82,7 +82,18 @@ Optional:
 
 - Repository: https://github.com/SockedRooster/RoosterWorks-Inflatable-Fuel-Depot
 - Issues: https://github.com/SockedRooster/RoosterWorks-Inflatable-Fuel-Depot/issues
-- License: [MIT](LICENSE), copyright © 2026 SockedRooster
+- License: [Dual license](LICENSE), copyright © 2026 SockedRooster
 - Mod source: `Source/InflataDepotPlugin/` (C#), `Source/build.py` (asset generator), and `Source/test_assets.py`.
 
 This package does not bundle third-party dependency binaries or KSP/Unity game libraries.
+
+## License
+
+Copyright (c) 2026 SockedRooster.
+
+This project uses **dual licensing**:
+
+- **Art assets:** All `.dds`, `.png`, and `.mu` files are **All Rights Reserved**. You may not redistribute or re-use these assets without express permission from the author.
+- **Everything else:** Original source code, configuration files, documentation, and other non-art files are distributed under the **MIT License**, subject to its terms.
+
+See the full [LICENSE](LICENSE) file for the MIT permission notice, conditions, and warranty disclaimer. Third-party content and dependencies retain their respective licenses; this notice does not grant rights to third-party assets.
